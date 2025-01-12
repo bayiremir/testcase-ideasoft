@@ -1,6 +1,8 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {storage} from '../../utils/Storage';
 import {BASEURL, API_KEY} from '@env';
+import {Products} from '../../interface/products.interface';
+import {CategoriesList} from '../../interface/categories.interface';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASEURL,
@@ -30,10 +32,79 @@ export const ideasoftApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithCheck,
   endpoints: builder => ({
-    getProducts: builder.query({
+    // Product Endpoints
+    getProducts: builder.query<Products, void>({
       query: () => 'products',
+    }),
+    getProductById: builder.query<Products, number>({
+      query: id => `products/${id}`,
+    }),
+    createProduct: builder.mutation<void, Partial<Products>>({
+      query: body => ({
+        url: 'products',
+        method: 'POST',
+        body,
+      }),
+    }),
+    updateProduct: builder.mutation<
+      void,
+      {id: number; data: Partial<Products>}
+    >({
+      query: ({id, data}) => ({
+        url: `products/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+    }),
+    deleteProduct: builder.mutation<void, number>({
+      query: id => ({
+        url: `products/${id}`,
+        method: 'DELETE',
+      }),
+    }),
+
+    // Category Endpoints
+    getCategories: builder.query<CategoriesList, void>({
+      query: () => 'categories',
+    }),
+    getCategoryById: builder.query<CategoriesList, number>({
+      query: id => `categories/${id}`,
+    }),
+    createCategory: builder.mutation<void, Partial<CategoriesList>>({
+      query: body => ({
+        url: 'categories',
+        method: 'POST',
+        body,
+      }),
+    }),
+    updateCategory: builder.mutation<
+      void,
+      {id: number; data: Partial<CategoriesList>}
+    >({
+      query: ({id, data}) => ({
+        url: `categories/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+    }),
+    deleteCategory: builder.mutation<void, number>({
+      query: id => ({
+        url: `categories/${id}`,
+        method: 'DELETE',
+      }),
     }),
   }),
 });
 
-export const {} = ideasoftApi;
+export const {
+  useGetProductsQuery,
+  useGetProductByIdQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+  useDeleteProductMutation,
+  useGetCategoriesQuery,
+  useGetCategoryByIdQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+} = ideasoftApi;
