@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import React from 'react';
 import {COLORS} from '../../../constants/COLORS';
-import {useTheme} from '../../../hooks/useTheme';
 import {Fonts} from '../../../../interface/fonts.enum';
 
 export interface ButtonProps {
@@ -32,8 +31,6 @@ const CustomModal = ({
   type,
   visible,
 }: CustomModalProps) => {
-  const {cardTextColor} = useTheme();
-
   const buttonBackgroundColor = (isFocused: boolean) => {
     if (type === 'success' && isFocused) {
       return COLORS.successButtonBg;
@@ -95,16 +92,16 @@ const CustomModal = ({
             style={{width: 60, height: 60, position: 'absolute', top: -30}}
             source={modalIcon()}
           />
-          <Text style={[styles.modalTitle, {color: cardTextColor}]}>
+          <Text style={[styles.modalTitle, {color: 'white'}]}>
             {type === 'success'
-              ? 'success'
+              ? 'Başarılı'
               : type === 'warning'
-              ? 'warning'
+              ? 'Uyarı'
               : type === 'error'
-              ? 'error'
-              : 'info'}
+              ? 'Hata'
+              : 'Bilgi'}
           </Text>
-          <Text style={[styles.modalText, {color: cardTextColor}]}>
+          <Text style={[styles.modalText, {color: 'white'}]}>
             {description}
           </Text>
           <View style={styles.buttonContainer}>
@@ -196,7 +193,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: Fonts.SemiBold,
     fontSize: 14,
-
     textAlign: 'center',
   },
 });

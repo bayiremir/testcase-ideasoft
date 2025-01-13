@@ -7,11 +7,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  logoContainer: {
+    position: 'absolute',
+    top: 100,
+    alignItems: 'center',
+  },
+  logo: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginBottom: 20,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontFamily: Fonts.ExtraBold,
     color: '#fff',
-    marginBottom: 40,
   },
   cardContainer: {
     flexDirection: 'row',

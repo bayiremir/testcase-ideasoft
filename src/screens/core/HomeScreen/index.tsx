@@ -13,8 +13,14 @@ const HomeScreen = () => {
       style={styles.container}
       start={{x: 0, y: 0}}
       end={{x: 1, y: 1}}>
-      <Text style={styles.title}>Yönetim Paneli</Text>
-
+      <View style={styles.logoContainer}>
+        <Image
+          source={require('../../../../assets/logo/ideasoft.jpg')}
+          style={styles.logo}
+        />
+        <Text style={styles.title}>IdeaSoft Test Case</Text>
+        <Text style={styles.title}>Yönetim Paneli</Text>
+      </View>
       <View style={styles.cardContainer}>
         {/* Ürünler */}
         <TouchableOpacity

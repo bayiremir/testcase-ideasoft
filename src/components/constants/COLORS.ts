@@ -34,7 +34,7 @@ export const COLORS = {
   listItemSelected: '#d1eaff',
 
   // Buton Renkleri
-  buttonPrimaryBg: '#2575fc',
+  buttonPrimaryBg: '#0468BF',
   buttonPrimaryText: '#ffffff',
   buttonSecondaryBg: '#0AA06E',
   buttonSecondaryText: '#ffffff',
