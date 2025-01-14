@@ -1,5 +1,5 @@
 import {useSelector} from 'react-redux';
-import {userSliceInitialStateType} from '../../interface/user.interface';
+import {userSliceInitialStateType} from '../../interface/userslice.interface';
 
 export const useTheme = () => {
   const {theme} = useSelector(

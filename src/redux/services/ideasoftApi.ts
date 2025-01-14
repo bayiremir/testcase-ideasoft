@@ -33,8 +33,11 @@ export const ideasoftApi = createApi({
   baseQuery: baseQueryWithCheck,
   endpoints: builder => ({
     // Product Endpoints
-    getProducts: builder.query<Products, void>({
-      query: () => 'products',
+    getProducts: builder.query<Products, Record<string, any>>({
+      query: params => {
+        const queryParams = new URLSearchParams(params).toString();
+        return `products?${queryParams}`;
+      },
     }),
     getProductById: builder.query<Products, number>({
       query: id => `products/${id}`,

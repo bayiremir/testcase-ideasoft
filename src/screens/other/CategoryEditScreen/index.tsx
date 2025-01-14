@@ -16,15 +16,17 @@ import {
 import {useCustomModal} from '../../../components/other_components/Modal/CustomModal/CustomModalProvider';
 import {COLORS} from '../../../components/constants/COLORS';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {RouteProp, useRoute} from '@react-navigation/native';
+import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {styles} from './styles';
 import Lottie from '../../../components/other_components/Lottie';
+import {RootNavigationType} from '../../../interface/navigation.interface';
 
 interface CategoryRouteParams {
   categoryId: number;
 }
 
 const CategoryEditScreen = () => {
+  const navigation = useNavigation<RootNavigationType>();
   const route = useRoute<RouteProp<{params: CategoryRouteParams}, 'params'>>();
   const {categoryId: categoryId} = route.params;
   const {data, isLoading, refetch} = useGetCategoryByIdQuery(categoryId) as {
@@ -34,7 +36,6 @@ const CategoryEditScreen = () => {
   };
   const [updateCategory, {isLoading: isUpdating}] = useUpdateCategoryMutation();
   const {showModal, hideModal} = useCustomModal();
-  console.log('Data:', data);
   const {control, handleSubmit, reset, setValue, watch} = useForm({
     defaultValues: {
       name: '',
@@ -93,7 +94,6 @@ const CategoryEditScreen = () => {
         percent: parseFloat(data.percent),
       };
 
-      console.log('Gönderilen Payload:', payload);
       await updateCategory({id: categoryId, data: payload}).unwrap();
 
       showModal({
@@ -102,7 +102,10 @@ const CategoryEditScreen = () => {
         buttons: [
           {
             text: 'Tamam',
-            onPress: hideModal,
+            onPress: () => {
+              hideModal();
+              navigation.goBack();
+            },
             isFocused: true,
           },
         ],

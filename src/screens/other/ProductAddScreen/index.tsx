@@ -113,7 +113,6 @@ const ProductAddScreen = () => {
         },
       };
 
-      console.log('Gönderilen Payload:', payload); // Debug için
       await createProduct(payload).unwrap();
 
       showModal({
@@ -212,7 +211,7 @@ const ProductAddScreen = () => {
 
   return (
     <>
-      <GoBackTabBar title="Ürün Ekle" detail={false} add={false} />
+      <GoBackTabBar title="Ürün Ekle" add={false} />
       {categoryLoading ? (
         <Lottie />
       ) : (

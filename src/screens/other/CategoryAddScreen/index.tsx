@@ -72,7 +72,6 @@ const CategoryAddScreen = () => {
         percent: parseFloat(data.percent),
       };
 
-      console.log('Gönderilen Payload:', payload);
       await createCategory(payload).unwrap();
 
       showModal({
@@ -152,7 +151,7 @@ const CategoryAddScreen = () => {
 
   return (
     <>
-      <GoBackTabBar title="Kategori Ekle" detail={false} add={false} />
+      <GoBackTabBar title="Kategori Ekle" add={false} />
       <KeyboardAwareScrollView
         style={styles.container}
         extraScrollHeight={50}

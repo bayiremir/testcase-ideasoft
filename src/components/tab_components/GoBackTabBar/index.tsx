@@ -1,5 +1,5 @@
 import {StyleSheet, TouchableOpacity, View, Text} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   ChevronLeftIcon as ChevronLeftIconOutline,
   PlusCircleIcon as PlusCircleIconOutline,
@@ -20,6 +20,7 @@ import {setListView} from '../../../redux/slices/userSlice';
 import {storage} from '../../../utils/Storage';
 import {COLORS} from '../../constants/COLORS';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {userSliceInitialStateType} from '../../../interface/userslice.interface';
 
 const GoBackTabBar = ({
   title,
@@ -41,14 +42,16 @@ const GoBackTabBar = ({
   categoryId?: number;
 }) => {
   const navigation = useNavigation<RootNavigationType>();
-  const [deleteProduct] = useDeleteProductMutation();
-  const [deleteCategory] = useDeleteCategoryMutation();
+  const [deleteProduct, {data: deleteProductData}] = useDeleteProductMutation();
+  const [deleteCategory, {data: deleteCategoryData}] =
+    useDeleteCategoryMutation();
   const {showModal, hideModal} = useCustomModal();
   const dispatch = useDispatch();
-  const {listview} = useSelector((state: any) => state.userSlice);
+  const {listview} = useSelector(
+    (state: userSliceInitialStateType) => state.userSlice,
+  );
   const insets = useSafeAreaInsets();
   const statusBarHeight = insets.top;
-
   const confirmDelete = () => {
     showModal({
       type: 'info',
@@ -79,20 +82,6 @@ const GoBackTabBar = ({
         if (productId !== undefined) {
           await deleteProduct(productId).unwrap();
         }
-        showModal({
-          type: 'success',
-          description: 'Ürün başarıyla silindi.',
-          buttons: [
-            {
-              text: 'Tamam',
-              onPress: () => {
-                hideModal();
-                navigation.goBack();
-              },
-              isFocused: true,
-            },
-          ],
-        });
       } catch (error) {
         console.error('Silme işlemi sırasında hata:', error);
         showModal({
@@ -113,20 +102,6 @@ const GoBackTabBar = ({
         if (categoryId !== undefined) {
           await deleteCategory(categoryId).unwrap();
         }
-        showModal({
-          type: 'success',
-          description: 'Ürün başarıyla silindi.',
-          buttons: [
-            {
-              text: 'Tamam',
-              onPress: () => {
-                hideModal();
-                navigation.goBack();
-              },
-              isFocused: true,
-            },
-          ],
-        });
       } catch (error) {
         console.error('Silme işlemi sırasında hata:', error);
         showModal({
@@ -144,6 +119,45 @@ const GoBackTabBar = ({
       }
     }
   };
+
+  useEffect(() => {
+    if (deleteProductData === null) {
+      showModal({
+        type: 'success',
+        description: 'Ürün başarıyla silindi.',
+        buttons: [
+          {
+            text: 'Tamam',
+            onPress: () => {
+              hideModal();
+              navigation.goBack();
+            },
+            isFocused: true,
+          },
+        ],
+      });
+    } else if (deleteCategoryData === null) {
+      showModal({
+        type: 'success',
+        description: 'Kategori başarıyla silindi.',
+        buttons: [
+          {
+            text: 'Tamam',
+            onPress: () => {
+              hideModal();
+              navigation.goBack();
+            },
+            isFocused: true,
+          },
+        ],
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deleteProductData, deleteCategoryData]);
+
+  useEffect(() => {
+    console.log('delete', deleteCategoryData);
+  }, [deleteCategoryData]);
 
   const changeListView = async () => {
     const currentListView = listview === 1 ? 2 : 1;
