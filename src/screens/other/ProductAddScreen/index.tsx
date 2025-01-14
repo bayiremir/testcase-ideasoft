@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  KeyboardTypeOptions,
 } from 'react-native';
 import {useForm, Controller} from 'react-hook-form';
 import GoBackTabBar from '../../../components/tab_components/GoBackTabBar';
@@ -53,8 +54,8 @@ const ProductAddScreen = () => {
   const nameValue = watch('name');
 
   useEffect(() => {
-    const generateSlug = text => {
-      const turkishCharMap = {
+    const generateSlug = (text: string) => {
+      const turkishCharMap: {[key: string]: string} = {
         ç: 'c',
         ğ: 'g',
         ı: 'i',
@@ -79,7 +80,7 @@ const ProductAddScreen = () => {
     setValue('slug', generateSlug(nameValue || ''));
   }, [nameValue, setValue]);
 
-  const onSubmit = async data => {
+  const onSubmit = async (data: any) => {
     if (!selectedCategoryId) {
       showModal({
         type: 'error',
@@ -253,7 +254,9 @@ const ProductAddScreen = () => {
                 onValueChange={setSelectedCategoryId}
                 items={
                   categories
-                    ? categories.map(cat => ({label: cat.name, value: cat.id}))
+                    ? categories
+                        .filter(cat => cat.status === 1)
+                        .map(cat => ({label: cat.name, value: cat.id}))
                     : []
                 }
                 value={selectedCategoryId}
@@ -267,7 +270,7 @@ const ProductAddScreen = () => {
                 <Controller
                   key={name}
                   control={control}
-                  name={name}
+                  name={name as any}
                   rules={
                     required ? {required: `${label} zorunludur`} : undefined
                   }
@@ -286,7 +289,7 @@ const ProductAddScreen = () => {
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={String(value)}
-                        keyboardType={keyboardType}
+                        keyboardType={keyboardType as KeyboardTypeOptions}
                       />
                       {error && (
                         <Text style={styles.error}>{error.message}</Text>

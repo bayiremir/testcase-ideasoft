@@ -5,9 +5,13 @@ import {
   PlusCircleIcon as PlusCircleIconOutline,
   TrashIcon as TrashIconOutline,
   Bars3Icon as Bars3IconOutline,
+  PencilSquareIcon as PencilSquareIconOutline,
 } from 'react-native-heroicons/outline';
 import {useNavigation} from '@react-navigation/native';
-import {useDeleteProductMutation} from '../../../redux/services/ideasoftApi';
+import {
+  useDeleteCategoryMutation,
+  useDeleteProductMutation,
+} from '../../../redux/services/ideasoftApi';
 import {Fonts} from '../../../interface/fonts.enum';
 import {useCustomModal} from '../../other_components/Modal/CustomModal/CustomModalProvider';
 import {RootNavigationType} from '../../../interface/navigation.interface';
@@ -15,25 +19,36 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setListView} from '../../../redux/slices/userSlice';
 import {storage} from '../../../utils/Storage';
 import {COLORS} from '../../constants/COLORS';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const GoBackTabBar = ({
   title,
-  detail,
   add,
   productId,
   change,
+  addcategory,
+  product,
+  category,
+  categoryId,
 }: {
   title: string;
-  detail: boolean;
   add: boolean;
   productId?: number;
   change?: boolean;
+  addcategory?: boolean;
+  product?: boolean;
+  category?: boolean;
+  categoryId?: number;
 }) => {
   const navigation = useNavigation<RootNavigationType>();
   const [deleteProduct] = useDeleteProductMutation();
+  const [deleteCategory] = useDeleteCategoryMutation();
   const {showModal, hideModal} = useCustomModal();
   const dispatch = useDispatch();
   const {listview} = useSelector((state: any) => state.userSlice);
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = insets.top;
+
   const confirmDelete = () => {
     showModal({
       type: 'info',
@@ -49,7 +64,7 @@ const GoBackTabBar = ({
         {
           text: 'Evet',
           onPress: () => {
-            handleDelete();
+            handleDeleteProduct();
             hideModal();
           },
           isFocused: false,
@@ -58,10 +73,46 @@ const GoBackTabBar = ({
     });
   };
 
-  const handleDelete = async () => {
-    if (productId) {
+  const handleDeleteProduct = async () => {
+    if (product) {
       try {
-        await deleteProduct(productId).unwrap();
+        if (productId !== undefined) {
+          await deleteProduct(productId).unwrap();
+        }
+        showModal({
+          type: 'success',
+          description: 'Ürün başarıyla silindi.',
+          buttons: [
+            {
+              text: 'Tamam',
+              onPress: () => {
+                hideModal();
+                navigation.goBack();
+              },
+              isFocused: true,
+            },
+          ],
+        });
+      } catch (error) {
+        console.error('Silme işlemi sırasında hata:', error);
+        showModal({
+          type: 'error',
+          description:
+            'Ürün silinirken bir hata oluştu. Lütfen tekrar deneyin.',
+          buttons: [
+            {
+              text: 'Tamam',
+              onPress: () => hideModal(),
+              isFocused: false,
+            },
+          ],
+        });
+      }
+    } else if (category) {
+      try {
+        if (categoryId !== undefined) {
+          await deleteCategory(categoryId).unwrap();
+        }
         showModal({
           type: 'success',
           description: 'Ürün başarıyla silindi.',
@@ -102,7 +153,7 @@ const GoBackTabBar = ({
 
   return (
     <View>
-      <View style={styles.tabBarContainer}>
+      <View style={[styles.tabBarContainer, {marginTop: statusBarHeight}]}>
         <TouchableOpacity
           onPress={() => {
             navigation.goBack();
@@ -110,8 +161,24 @@ const GoBackTabBar = ({
           <ChevronLeftIconOutline color="black" size={24} />
         </TouchableOpacity>
         <Text style={styles.headerText}>{title}</Text>
-        {detail && productId && (
+        {product && (
           <View>
+            <TouchableOpacity onPress={confirmDelete}>
+              <TrashIconOutline color="black" size={24} />
+            </TouchableOpacity>
+          </View>
+        )}
+        {category && (
+          <View style={styles.rowcontainer}>
+            <TouchableOpacity
+              style={styles.rightIcon}
+              onPress={() => {
+                navigation.navigate('CategoryEditScreen', {
+                  categoryId: categoryId,
+                });
+              }}>
+              <PencilSquareIconOutline color="black" size={24} />
+            </TouchableOpacity>
             <TouchableOpacity onPress={confirmDelete}>
               <TrashIconOutline color="black" size={24} />
             </TouchableOpacity>
@@ -120,7 +187,7 @@ const GoBackTabBar = ({
         {add && change && (
           <View style={styles.rowcontainer}>
             <TouchableOpacity
-              style={{marginRight: 10}}
+              style={styles.rightIcon}
               onPress={() => {
                 changeListView();
               }}>
@@ -132,6 +199,16 @@ const GoBackTabBar = ({
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('ProductAddScreen', {});
+              }}>
+              <PlusCircleIconOutline color="black" size={24} />
+            </TouchableOpacity>
+          </View>
+        )}
+        {addcategory && (
+          <View style={styles.rowcontainer}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('CategoryAddScreen', {});
               }}>
               <PlusCircleIconOutline color="black" size={24} />
             </TouchableOpacity>
@@ -150,14 +227,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 20,
-    paddingTop: 50,
     marginVertical: 10,
   },
   headerText: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: Fonts.Bold,
   },
   rowcontainer: {
     flexDirection: 'row',
+  },
+  rightIcon: {
+    right: 10,
   },
 });

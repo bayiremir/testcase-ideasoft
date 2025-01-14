@@ -3001,7 +3001,6 @@ __metadata:
     "@reduxjs/toolkit": ^2.5.0
     "@types/react": ^18.2.6
     "@types/react-test-renderer": ^18.0.0
-    add: ^2.0.6
     babel-jest: ^29.6.3
     eslint: ^8.19.0
     jest: ^29.6.3
@@ -3020,6 +3019,7 @@ __metadata:
     react-native-safe-area-context: ^5.1.0
     react-native-svg: ^15.11.1
     react-native-toast-message: ^2.2.1
+    react-native-webview: ^13.13.1
     react-redux: ^9.2.0
     react-test-renderer: 18.3.1
     redux: ^5.0.1
@@ -3069,13 +3069,6 @@ __metadata:
   bin:
     acorn: bin/acorn
   checksum: 8755074ba55fff94e84e81c72f1013c2d9c78e973c31231c8ae505a5f966859baf654bddd75046bffd73ce816b149298977fff5077a3033dedba0ae2aad152d4
-  languageName: node
-  linkType: hard
-
-"add@npm:^2.0.6":
-  version: 2.0.6
-  resolution: "add@npm:2.0.6"
-  checksum: e2d23d40494565dfed4acd65e478570c444db5ac6c053551ed429c39ea0f2c99d83df63e7befec936df601827d2254d06a2fb6f7dcfd2022e810b25eab818b8c
   languageName: node
   linkType: hard
 
@@ -5689,7 +5682,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"invariant@npm:^2.2.4":
+"invariant@npm:2.2.4, invariant@npm:^2.2.4":
   version: 2.2.4
   resolution: "invariant@npm:2.2.4"
   dependencies:
@@ -8367,6 +8360,19 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: c6b5d231b3b617b3d3d893023673534fe2cc0c5f32bb5fc4aecfe239e9de2fb9f0e9a4086d776e53daf3bc2376dce16dcec13e1b5cf1554dbf51808695fc2441
+  languageName: node
+  linkType: hard
+
+"react-native-webview@npm:^13.13.1":
+  version: 13.13.1
+  resolution: "react-native-webview@npm:13.13.1"
+  dependencies:
+    escape-string-regexp: ^4.0.0
+    invariant: 2.2.4
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: ca65189bf53ec756e4d5c07d7cc3790bb5ee6c07f7f9d83faebc94c3a01af04ceea79cf9f32b16ce24de9bc478536c3f72bbb236a7ebdce481d0494d9b1ceeda
   languageName: node
   linkType: hard
 

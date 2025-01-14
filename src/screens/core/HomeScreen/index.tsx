@@ -52,6 +52,17 @@ const HomeScreen = () => {
           </View>
           <Text style={styles.cardTitle}>Kategori Yönetimi</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate('TestCaseScreen', {})}>
+          <View style={styles.iconContainer}>
+            <Image
+              source={require('../../../../assets/logo/ideasoft.jpg')}
+              style={styles.icon}
+            />
+          </View>
+          <Text style={styles.cardTitle}>IdeaSoft</Text>
+        </TouchableOpacity>
       </View>
     </LinearGradient>
   );

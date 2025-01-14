@@ -5,8 +5,14 @@ export type RootStackParamList = {
   HomeScreen: {};
   CategoryScreen: {};
   ProductScreen: {};
+  TestCaseScreen: {};
   ProductForm: {};
   ProductAddScreen: {};
+  CategoryAddScreen: {};
+  CategoryEditScreen: {};
+  CategoryForm: {};
+  CategoryCard: {};
+  CategoryList: {};
 };
 
 export type RootNavigationType = NativeStackNavigationProp<RootStackParamList>;

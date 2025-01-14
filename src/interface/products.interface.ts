@@ -1,6 +1,7 @@
 export type Products = Products2[];
 
 export interface Products2 {
+  details: any;
   id: number;
   name: string;
   fullName: string;

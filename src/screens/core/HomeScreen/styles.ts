@@ -8,8 +8,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoContainer: {
-    position: 'absolute',
-    top: 100,
+    marginBottom: 50,
     alignItems: 'center',
   },
   logo: {
@@ -55,6 +54,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 50,
     height: 50,
+    borderRadius: 50,
   },
   cardTitle: {
     fontSize: 16,

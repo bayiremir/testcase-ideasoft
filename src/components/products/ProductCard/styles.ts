@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
     padding: 15,
   },
   card: {
+    margin: 15,
     backgroundColor: COLORS.surface,
     borderRadius: 10,
     shadowColor: COLORS.shadowDark,
@@ -22,8 +23,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   gridCard: {
+    margin: 15,
     width: '48%',
-    margin: '1%',
     alignItems: 'center',
     padding: 10,
     backgroundColor: '#fff',

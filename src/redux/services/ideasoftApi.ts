@@ -65,7 +65,7 @@ export const ideasoftApi = createApi({
 
     // Category Endpoints
     getCategories: builder.query<CategoriesList, void>({
-      query: () => 'categories',
+      query: () => 'categories/search_tree',
     }),
     getCategoryById: builder.query<CategoriesList, number>({
       query: id => `categories/${id}`,

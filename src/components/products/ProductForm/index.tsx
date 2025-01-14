@@ -1,4 +1,4 @@
-import {Image, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {Image, ScrollView, Text, View} from 'react-native';
 import React from 'react';
 import {useRoute, RouteProp} from '@react-navigation/native';
 import {useGetProductByIdQuery} from '../../../redux/services/ideasoftApi';
@@ -22,7 +22,7 @@ const ProductForm = () => {
 
   return (
     <View style={styles.container}>
-      <GoBackTabBar add={false} detail={true} title={name} productId={id} />
+      <GoBackTabBar add={false} product={true} title={name} productId={id} />
       {isLoading || !data ? (
         <Lottie />
       ) : (
