@@ -18,7 +18,12 @@ const ProductScreen = () => {
 
   return (
     <View style={styles.container}>
-      <GoBackTabBar add={true} detail={false} title={'Ürünler Listesi'} />
+      <GoBackTabBar
+        change={true}
+        add={true}
+        detail={false}
+        title={'Ürünler Listesi'}
+      />
       {isLoading ? (
         <Lottie />
       ) : (

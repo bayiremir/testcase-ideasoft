@@ -1,11 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  KeyboardTypeOptions,
 } from 'react-native';
 import {useForm, Controller} from 'react-hook-form';
 import GoBackTabBar from '../../../components/tab_components/GoBackTabBar';
@@ -21,8 +20,15 @@ import Lottie from '../../../components/other_components/Lottie';
 import RNPickerSelect from 'react-native-picker-select';
 
 const ProductAddScreen = () => {
+  const [createProduct, {isLoading}] = useCreateProductMutation();
+  const {data: categories, isLoading: categoryLoading} =
+    useGetCategoriesQuery();
+  const [currencyId, setCurrencyId] = useState(1);
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [selectedGift, setSelectedGift] = useState('');
   const {showModal, hideModal} = useCustomModal();
-  const {control, handleSubmit, reset} = useForm({
+
+  const {control, handleSubmit, reset, watch, setValue} = useForm({
     defaultValues: {
       name: '',
       fullName: '',
@@ -35,20 +41,61 @@ const ProductAddScreen = () => {
       tax: '',
       warranty: '',
       distributor: '',
-      categoryId: '', // Yeni kategori alanı
+      categoryId: '',
       status: 1,
       currency: {id: 1},
+      gift: '',
+      details: '',
+      extraDetails: '',
     },
   });
 
-  const [createProduct, {isLoading}] = useCreateProductMutation();
-  const {data: category, isLoading: categoryLoading} = useGetCategoriesQuery();
-  const [currencyId, setCurrencyId] = useState(1);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(''); // Kategori seçimi için state
+  const nameValue = watch('name');
 
-  const onSubmit = async (data: any) => {
+  useEffect(() => {
+    const generateSlug = text => {
+      const turkishCharMap = {
+        ç: 'c',
+        ğ: 'g',
+        ı: 'i',
+        ö: 'o',
+        ş: 's',
+        ü: 'u',
+        Ç: 'c',
+        Ğ: 'g',
+        İ: 'i',
+        Ö: 'o',
+        Ş: 's',
+        Ü: 'u',
+      };
+      return text
+        .replace(/[çğışöüÇĞİŞÖÜ]/g, char => turkishCharMap[char] || char)
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9-]/g, '-')
+        .replace(/-+/g, '-');
+    };
+
+    setValue('slug', generateSlug(nameValue || ''));
+  }, [nameValue, setValue]);
+
+  const onSubmit = async data => {
+    if (!selectedCategoryId) {
+      showModal({
+        type: 'error',
+        description: 'Kategori seçmelisiniz.',
+        buttons: [
+          {
+            text: 'Tamam',
+            onPress: hideModal,
+            isFocused: true,
+          },
+        ],
+      });
+      return;
+    }
     try {
-      await createProduct({
+      const payload = {
         ...data,
         price1: parseFloat(data.price1),
         stockAmount: parseFloat(data.stockAmount),
@@ -57,21 +104,30 @@ const ProductAddScreen = () => {
         warranty: parseInt(data.warranty, 10),
         currency: {id: currencyId},
         status: data.status,
-      }).unwrap();
+        categories: selectedCategoryId ? [{id: selectedCategoryId}] : [],
+        hasGift: selectedGift,
+        detail: {
+          details: `${data.details}`,
+          extraDetails: data.extraDetails || '',
+        },
+      };
+
+      console.log('Gönderilen Payload:', payload); // Debug için
+      await createProduct(payload).unwrap();
+
       showModal({
         type: 'success',
         description: 'Ürün başarıyla eklendi.',
         buttons: [
           {
             text: 'Tamam',
-            onPress: () => {
-              hideModal();
-            },
+            onPress: hideModal,
             isFocused: true,
           },
         ],
       });
-      reset(); // Formu sıfırla
+      reset();
+      setSelectedCategoryId('');
     } catch (e) {
       showModal({
         type: 'error',
@@ -79,39 +135,16 @@ const ProductAddScreen = () => {
         buttons: [
           {
             text: 'Tamam',
-            onPress: () => {
-              hideModal();
-            },
+            onPress: hideModal,
             isFocused: true,
           },
         ],
       });
-      console.error(e);
+      console.error('Hata:', e);
     }
   };
 
-  const formFields: Array<{
-    name:
-      | 'name'
-      | 'fullName'
-      | 'slug'
-      | 'sku'
-      | 'barcode'
-      | 'stockAmount'
-      | 'price1'
-      | 'discount'
-      | 'tax'
-      | 'warranty'
-      | 'distributor'
-      | 'categoryId'
-      | 'status'
-      | 'currency'
-      | 'currency.id';
-    label: string;
-    placeholder: string;
-    required?: boolean;
-    keyboardType?: KeyboardTypeOptions;
-  }> = [
+  const formFields = [
     {name: 'name', label: 'Ürün Adı', placeholder: 'Ürün Adı', required: true},
     {
       name: 'fullName',
@@ -121,8 +154,7 @@ const ProductAddScreen = () => {
     },
     {name: 'slug', label: 'Slug', placeholder: 'Slug'},
     {name: 'sku', label: 'SKU *', placeholder: 'Stok Kodu', required: true},
-    {name: 'barcode', label: 'Barkod', placeholder: 'Barkod'},
-
+    {name: 'barcode', label: 'Barkod', placeholder: 'Barkod', required: true},
     {
       name: 'stockAmount',
       label: 'Stok Miktarı *',
@@ -142,20 +174,39 @@ const ProductAddScreen = () => {
       label: 'İndirim',
       placeholder: 'İndirim (%)',
       keyboardType: 'numeric',
+      required: true,
     },
     {
       name: 'tax',
       label: 'Vergi Oranı (%)',
       placeholder: 'Vergi Oranı',
       keyboardType: 'numeric',
+      required: true,
     },
     {
       name: 'warranty',
       label: 'Garanti Süresi (Ay)',
       placeholder: 'Garanti Süresi',
       keyboardType: 'numeric',
+      required: true,
     },
-    {name: 'distributor', label: 'Distribütör', placeholder: 'Distribütör'},
+    {
+      name: 'distributor',
+      label: 'Distribütör',
+      placeholder: 'Distribütör',
+      required: true,
+    },
+    {
+      name: 'details',
+      label: 'Detay Bilgisi',
+      placeholder: 'Ürün detaylarını girin',
+      required: true,
+    },
+    {
+      name: 'extraDetails',
+      label: 'Ekstra Detay Bilgisi',
+      placeholder: 'Ekstra detayları girin',
+    },
   ];
 
   return (
@@ -171,66 +222,38 @@ const ProductAddScreen = () => {
           <View style={styles.secondcontainer}>
             <Text style={styles.title}>Ürün Bilgilerini Girin</Text>
 
-            {/* Döviz Seçimi */}
             <View style={styles.currencyContainer}>
               <Text style={styles.label}>Döviz Seçimi</Text>
               <View style={styles.currencyButtons}>
-                <TouchableOpacity
-                  style={[
-                    styles.currencyButton,
-                    currencyId === 1 && styles.currencyButtonActive,
-                  ]}
-                  onPress={() => setCurrencyId(1)}>
-                  <Text
+                {['USD', 'EUR', 'TL'].map((currency, index) => (
+                  <TouchableOpacity
+                    key={currency}
                     style={[
-                      styles.currencyButtonText,
-                      currencyId === 1 && {color: COLORS.buttonPrimaryText},
-                    ]}>
-                    USD
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.currencyButton,
-                    currencyId === 2 && styles.currencyButtonActive,
-                  ]}
-                  onPress={() => setCurrencyId(2)}>
-                  <Text
-                    style={[
-                      styles.currencyButtonText,
-                      currencyId === 2 && {color: COLORS.buttonPrimaryText},
-                    ]}>
-                    EUR
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.currencyButton,
-                    currencyId === 3 && styles.currencyButtonActive,
-                  ]}
-                  onPress={() => setCurrencyId(3)}>
-                  <Text
-                    style={[
-                      styles.currencyButtonText,
-                      currencyId === 3 && {color: COLORS.buttonPrimaryText},
-                    ]}>
-                    TL
-                  </Text>
-                </TouchableOpacity>
+                      styles.currencyButton,
+                      currencyId === index + 1 && styles.currencyButtonActive,
+                    ]}
+                    onPress={() => setCurrencyId(index + 1)}>
+                    <Text
+                      style={[
+                        styles.currencyButtonText,
+                        currencyId === index + 1 && {
+                          color: COLORS.buttonPrimaryText,
+                        },
+                      ]}>
+                      {currency}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
-
-            {/* Kategori Seçimi */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Kategori</Text>
               <RNPickerSelect
-                onValueChange={value => setSelectedCategoryId(value)}
+                textInputProps={{pointerEvents: 'none'}}
+                onValueChange={setSelectedCategoryId}
                 items={
-                  category
-                    ? category.map((cat: any) => ({
-                        label: cat.name,
-                        value: cat.id,
-                      }))
+                  categories
+                    ? categories.map(cat => ({label: cat.name, value: cat.id}))
                     : []
                 }
                 value={selectedCategoryId}
@@ -239,7 +262,6 @@ const ProductAddScreen = () => {
               />
             </View>
 
-            {/* Form Alanları */}
             {formFields.map(
               ({name, label, placeholder, required, keyboardType}) => (
                 <Controller
@@ -264,7 +286,7 @@ const ProductAddScreen = () => {
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={String(value)}
-                        keyboardType={keyboardType as KeyboardTypeOptions}
+                        keyboardType={keyboardType}
                       />
                       {error && (
                         <Text style={styles.error}>{error.message}</Text>
@@ -273,6 +295,48 @@ const ProductAddScreen = () => {
                   )}
                 />
               ),
+            )}
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Hediye</Text>
+              <RNPickerSelect
+                textInputProps={{pointerEvents: 'none'}}
+                onValueChange={setSelectedGift}
+                items={[
+                  {label: 'Hediye Yok', value: '0'},
+                  {label: 'Hediye Var', value: '1'},
+                ]}
+                value={selectedGift}
+                placeholder={{label: 'Hediye Seçiniz', value: null}}
+                style={pickerSelectStyles}
+              />
+            </View>
+
+            {selectedGift === '1' && (
+              <Controller
+                key={'gift'}
+                control={control}
+                name="gift"
+                rules={{required: 'Hediye ürün zorunludur'}}
+                render={({
+                  field: {onChange, onBlur, value},
+                  fieldState: {error},
+                }) => (
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Hediye Ürün</Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        error ? styles.inputError : styles.inputNormal,
+                      ]}
+                      placeholder={'Hediye Ürün'}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={String(value)}
+                    />
+                  </View>
+                )}
+              />
             )}
 
             <TouchableOpacity

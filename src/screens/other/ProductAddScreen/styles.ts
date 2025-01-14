@@ -92,7 +92,6 @@ export const styles = StyleSheet.create({
 
 export const pickerSelectStyles = {
   inputAndroid: {
-    height: 40,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 5,
@@ -101,7 +100,7 @@ export const pickerSelectStyles = {
     backgroundColor: COLORS.background,
   },
   inputIOS: {
-    height: 40,
+    paddingVertical: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 5,

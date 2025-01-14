@@ -4,27 +4,36 @@ import {
   ChevronLeftIcon as ChevronLeftIconOutline,
   PlusCircleIcon as PlusCircleIconOutline,
   TrashIcon as TrashIconOutline,
+  Bars3Icon as Bars3IconOutline,
 } from 'react-native-heroicons/outline';
 import {useNavigation} from '@react-navigation/native';
 import {useDeleteProductMutation} from '../../../redux/services/ideasoftApi';
 import {Fonts} from '../../../interface/fonts.enum';
 import {useCustomModal} from '../../other_components/Modal/CustomModal/CustomModalProvider';
+import {RootNavigationType} from '../../../interface/navigation.interface';
+import {useDispatch, useSelector} from 'react-redux';
+import {setListView} from '../../../redux/slices/userSlice';
+import {storage} from '../../../utils/Storage';
+import {COLORS} from '../../constants/COLORS';
 
 const GoBackTabBar = ({
   title,
   detail,
   add,
   productId,
+  change,
 }: {
   title: string;
   detail: boolean;
   add: boolean;
   productId?: number;
+  change?: boolean;
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<RootNavigationType>();
   const [deleteProduct] = useDeleteProductMutation();
   const {showModal, hideModal} = useCustomModal();
-
+  const dispatch = useDispatch();
+  const {listview} = useSelector((state: any) => state.userSlice);
   const confirmDelete = () => {
     showModal({
       type: 'info',
@@ -85,6 +94,12 @@ const GoBackTabBar = ({
     }
   };
 
+  const changeListView = async () => {
+    const currentListView = listview === 1 ? 2 : 1;
+    dispatch(setListView(currentListView));
+    await storage.set('listview', currentListView);
+  };
+
   return (
     <View>
       <View style={styles.tabBarContainer}>
@@ -102,11 +117,21 @@ const GoBackTabBar = ({
             </TouchableOpacity>
           </View>
         )}
-        {add && (
-          <View>
+        {add && change && (
+          <View style={styles.rowcontainer}>
+            <TouchableOpacity
+              style={{marginRight: 10}}
+              onPress={() => {
+                changeListView();
+              }}>
+              <Bars3IconOutline
+                color={listview === 1 ? 'black' : COLORS.buttonPrimaryBg}
+                size={24}
+              />
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('ProductAddScreen');
+                navigation.navigate('ProductAddScreen', {});
               }}>
               <PlusCircleIconOutline color="black" size={24} />
             </TouchableOpacity>
@@ -131,5 +156,8 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 18,
     fontFamily: Fonts.Bold,
+  },
+  rowcontainer: {
+    flexDirection: 'row',
   },
 });

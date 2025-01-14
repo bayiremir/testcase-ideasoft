@@ -3,9 +3,10 @@ import {Text, View, TouchableOpacity, Image} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from './styles';
+import {RootNavigationType} from '../../../interface/navigation.interface';
 
 const HomeScreen = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<RootNavigationType>();
 
   return (
     <LinearGradient

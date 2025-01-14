@@ -45,8 +45,12 @@ const ProductForm = () => {
                 {data.discount} ₺)
               </Text>
             )}
-            <Text style={styles.productStock}>
-              Stok Durumu: {data.stockAmount > 0 ? 'Mevcut' : 'Tükendi'}
+            <Text
+              style={[
+                styles.productStock,
+                {color: data.stockAmount > 0 ? 'green' : 'red'},
+              ]}>
+              Stok Durumu: {data.stockAmount > 0 ? data.stockAmount : 'Tükendi'}
             </Text>
             <Text style={styles.productWarranty}>
               Garanti Süresi: {data.warranty} ay
@@ -59,7 +63,7 @@ const ProductForm = () => {
           <View style={styles.descriptionContainer}>
             <Text style={styles.sectionTitle}>Ürün Açıklaması</Text>
             <Text style={styles.productDescription}>
-              {data.metaDescription || 'Açıklama bulunmamaktadır.'}
+              {data.detail?.details || 'Açıklama bulunmamaktadır.'}
             </Text>
           </View>
         </ScrollView>
